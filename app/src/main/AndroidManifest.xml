@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.app.tourism_app"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.app.tourism_app">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,12 +14,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tourism_App">
 
-        <!--Initial Activity that is launched when we start the app -->
+
+        <!-- Initial Activity that is launched when we start the app -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -30,18 +32,25 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WriteReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PlaceDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreateUserActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
+            android:exported="false" />
 
     </application>
 
