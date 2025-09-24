@@ -54,6 +54,7 @@ dependencies {
     // Room
     implementation("androidx.room:room-runtime:2.7.0-alpha06")
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.preference)
     ksp("androidx.room:room-compiler:2.7.0-alpha06")
     implementation("androidx.room:room-ktx:2.7.0-alpha06")
 
@@ -63,4 +64,10 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("androidx.preference:preference-ktx:1.2.1")
 }
