@@ -25,6 +25,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // Initialize adapter
         adapter = LocationsAdapter { loc ->
             Log.d("HomeFragment", "Clicked: ${loc.title}")
+
+            // Start PlaceDetailActivity with the selected location data
+            val intent = android.content.Intent(requireContext(), PlaceDetailActivity::class.java).apply {
+                putExtra("place_title", loc.title)
+                putExtra("place_desc", loc.description)
+                putExtra("place_image", loc.imageUrl)
+                putExtra("place_id", loc.id)
+            }
+            startActivity(intent)
         }
 
         // Find RecyclerView and attach adapter + layout manager

@@ -20,7 +20,7 @@ class Repository(
             val remoteLocations = api.getLocations(
                 categories = "tourism.sights",
                 filter = "rect:79.6617,5.9180,81.9090,9.8341", // Sri Lanka bounding box
-                limit = 100,
+                limit = 50,
                 apiKey = "ff8eac3934aa4b74bd1229543e598951"
             ).features
             Log.d("Repository", "Fetched ${remoteLocations.size} locations")

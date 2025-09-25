@@ -7,61 +7,65 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.app.tourism_app.database.UserDatabase
 import com.app.tourism_app.database.repository.UserRepository
 import com.app.tourism_app.database.view.UserViewModel
 import com.app.tourism_app.database.view.UserViewModelFactory
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
-    private lateinit var login_btn : Button
-    private lateinit var create_user_btn : Button
-    private lateinit var username_field : EditText
-    private lateinit var password_field : EditText
-    private lateinit var user_repo : UserRepository
-    private lateinit var user_model : UserViewModel
+    private lateinit var loginBtn: Button
+    private lateinit var createUserBtn: Button
+    private lateinit var usernameField: EditText
+    private lateinit var passwordField: EditText
+
+    private lateinit var userViewModel: UserViewModel
+    private lateinit var userRepo: UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // UI
+        loginBtn = findViewById(R.id.login_btn)
+        createUserBtn = findViewById(R.id.create_user_btn)
+        usernameField = findViewById(R.id.userNameText)
+        passwordField = findViewById(R.id.passwordText)
 
-        val userDB  = UserDatabase.invoke(applicationContext)
-        user_repo = UserRepository(userDB)
-        user_model = ViewModelProvider(this, UserViewModelFactory(user_repo)).get(UserViewModel::class.java)
+        // DI: DB -> Repo -> ViewModel
+        val userDb = UserDatabase.getInstance(applicationContext)
+        userRepo = UserRepository(userDb)
+        val factory = UserViewModelFactory(userRepo)
+        userViewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
 
-        // initialize this otherwise this will crash because of lateinit
-        login_btn = findViewById(R.id.login_btn)
-        create_user_btn = findViewById(R.id.create_user_btn)
-        username_field = findViewById(R.id.userNameText)
-        password_field = findViewById(R.id.passwordText)
-
-        login_btn.setOnClickListener {
-            login()
-        }
-
-        create_user_btn.setOnClickListener {
-            val create_user_intent = Intent(this, CreateUserActivity::class.java)
-            startActivity(create_user_intent)
+        loginBtn.setOnClickListener { login() }
+        createUserBtn.setOnClickListener {
+            startActivity(Intent(this, CreateUserActivity::class.java))
         }
     }
 
     private fun login() {
-        val user_name = username_field.text.toString()
-        val password = password_field.text.toString()
+        val username = usernameField.text.toString().trim()
+        val password = passwordField.text.toString()
 
-        if(user_name.isNotEmpty() && password.isNotEmpty()){
-            user_model.getUserByName(user_name).observe(this) { user ->
-                if (user != null && user.password == password) {
-                    Toast.makeText(this, "Login Successful!!!", Toast.LENGTH_SHORT).show()
-                    val main_intent = Intent(this, MainActivity::class.java)
-                    startActivity(main_intent)
-                    finish()
-                } else {
-                    Toast.makeText(this, "Invalid Credentials!!!", Toast.LENGTH_SHORT).show()
-                }
+        if (username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Empty UserName or Password!!!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Use suspend lookup to avoid LiveData/observe mixing
+        lifecycleScope.launch {
+            val candidate = userRepo.getUserByName(username) // suspend DAO call inside repo
+            if (candidate != null && candidate.password == password) {
+                // mark as logged in
+                userViewModel.loginUser(candidate) // runs on viewModelScope
+                Toast.makeText(this@LoginActivity, "Login Successful!!!", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
+            } else {
+                Toast.makeText(this@LoginActivity, "Invalid Credentials!!!", Toast.LENGTH_SHORT).show()
             }
-        }else{
-            Toast.makeText(this,"Empty UserName or Password!!!",Toast.LENGTH_SHORT).show()
         }
     }
 }

@@ -25,7 +25,7 @@ class CreateUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_user)
 
-        val userDatabase = UserDatabase.invoke(applicationContext)
+        val userDatabase = UserDatabase.getInstance(applicationContext)
         user_repository = UserRepository(userDatabase)
         user_view_model = ViewModelProvider(this, UserViewModelFactory(user_repository)).get(UserViewModel::class.java)
 

@@ -7,9 +7,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "users")
 data class User(
     @ColumnInfo(name = "username")
-    var userName : String,
+    var userName: String,
     @ColumnInfo(name = "password")
-    var password : String
+    var password: String,
+    @ColumnInfo(name = "is_logged_in")
+    var isLoggedIn: Boolean = false
 ){
     @PrimaryKey(autoGenerate = true)
     var id : Int? = null
