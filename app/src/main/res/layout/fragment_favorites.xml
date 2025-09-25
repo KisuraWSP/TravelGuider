@@ -4,7 +4,8 @@
     android:id="@+id/favorites_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp">
+    android:padding="12dp"
+    android:background="#E0F7FA">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favorites"
