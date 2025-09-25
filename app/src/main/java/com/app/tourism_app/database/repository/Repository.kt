@@ -8,7 +8,6 @@ import com.app.tourism_app.database.model.Review
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 
 class Repository(
     private val api: ApiService,
@@ -20,14 +19,17 @@ class Repository(
         val remoteFlow: Flow<List<LocationUi>> = flow {
             val remoteLocations = api.getLocations(
                 categories = "tourism.sights",
-                filter = "rect:10.7,48.75,10.83,48.68",
-                limit = 20,
+                filter = "rect:79.6617,5.9180,81.9090,9.8341", // Sri Lanka bounding box
+                limit = 100,
                 apiKey = "ff8eac3934aa4b74bd1229543e598951"
             ).features
             Log.d("Repository", "Fetched ${remoteLocations.size} locations")
 
+            // Deduplicate by name
+            val uniqueLocations = remoteLocations.distinctBy { it.properties.name }
+
             // Map DTOs to UI model (reviews empty initially)
-            val initialList = remoteLocations.map { dto ->
+            val initialList = uniqueLocations.map { dto ->
                 LocationUi(
                     id = dto.properties.hashCode().toLong(),
                     title = dto.properties.name ?: "Unknown",

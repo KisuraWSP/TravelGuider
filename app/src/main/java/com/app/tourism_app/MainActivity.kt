@@ -45,8 +45,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_profile -> switchFragment(profileFragment)
                 R.id.nav_map -> switchFragment(mapFragment)
                 R.id.nav_favorites -> switchFragment(favoritesFragment)
-                else -> false
+                else -> return@setOnItemSelectedListener false
             }
+            true
         }
     }
 
