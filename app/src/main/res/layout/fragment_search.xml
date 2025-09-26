@@ -1,22 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/search_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="16dp"
+    android:background="#E0F7FA">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_view"
+    <!-- Search bar inside a card -->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="Search locations"/>
+        app:cardCornerRadius="24dp"
+        app:cardElevation="4dp"
+        android:layout_marginBottom="12dp">
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search locations"
+            android:background="@android:color/transparent"
+            android:padding="8dp"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Search results -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_search_results"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="4dp"
+        android:paddingBottom="16dp"/>
+
+    <!-- Empty state (hidden until shown in code) -->
+    <LinearLayout
+        android:id="@+id/empty_state_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="32dp">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:contentDescription="No results"
+            app:tint="#9E9E9E" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No results found"
+            android:textColor="#666"
+            android:paddingTop="8dp"
+            android:textSize="16sp"/>
+    </LinearLayout>
 
 </LinearLayout>

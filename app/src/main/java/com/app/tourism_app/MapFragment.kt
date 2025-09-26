@@ -26,6 +26,7 @@ import kotlinx.coroutines.withContext
 import android.widget.Toast
 import com.app.tourism_app.database.data.remote.LocationDto
 import android.annotation.SuppressLint
+import com.app.tourism_app.database.data.remote.Feature
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -175,51 +176,30 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         }
     }
 
-    private fun addMarkersFromDtos(list: List<LocationDto>) {
+    private fun addMarkersFromDtos(list: List<Feature>) {
         val map = googleMap ?: return
         map.clear()
 
-        for (dto in list) {
-            // Try multiple common shapes for coordinates (List<*>, DoubleArray, Array<Double>, etc)
-            val coordsAny = dto.geometry?.coordinates
+        for (f in list) {
+            val p = f.properties
+            val coords = f.geometry?.coordinates
+            // GeoJSON: [lon, lat]
+            if (coords == null || coords.size < 2) continue
+            val lon = coords[0]
+            val lat = coords[1]
 
-            val lonLat: Pair<Double, Double>? = when (coordsAny) {
-                is List<*> -> {
-                    val lon = (coordsAny.getOrNull(0) as? Number)?.toDouble()
-                    val lat = (coordsAny.getOrNull(1) as? Number)?.toDouble()
-                    if (lon != null && lat != null) Pair(lon, lat) else null
-                }
-                is DoubleArray -> {
-                    val lon = coordsAny.getOrNull(0)?.toDouble()
-                    val lat = coordsAny.getOrNull(1)?.toDouble()
-                    if (lon != null && lat != null) Pair(lon, lat) else null
-                }
-                is Array<*> -> {
-                    val lon = (coordsAny.get(0) as? Number)?.toDouble()
-                    val lat = (coordsAny.get(1) as? Number)?.toDouble()
-                    if (lon != null && lat != null) Pair(lon, lat) else null
-                }
-                else -> null
-            }
-
-            if (lonLat == null) {
-                // unable to extract coordinates — skip this dto
-                continue
-            }
-
-            val (lon, lat) = lonLat
-            // remember GeoJSON uses [lon, lat]
-            val pos = LatLng(lat, lon)
-            val title = dto.properties?.name ?: "Unknown"
-            val snippet = dto.properties?.description ?: ""
+            val pos = com.google.android.gms.maps.model.LatLng(lat, lon)
+            val title = p?.name ?: p?.formatted ?: "Unknown"
+            val snippet = p?.formatted ?: "" // Geoapify doesn't provide `description`
+            val tagId = (p?.placeId?.hashCode()?.toLong()) ?: title.hashCode().toLong()
 
             val marker = map.addMarker(
-                MarkerOptions()
+                com.google.android.gms.maps.model.MarkerOptions()
                     .position(pos)
                     .title(title)
                     .snippet(snippet)
             )
-            marker?.tag = dto.properties?.hashCode()?.toLong() ?: dto.hashCode().toLong()
+            marker?.tag = tagId
         }
     }
 

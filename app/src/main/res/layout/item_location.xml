@@ -1,28 +1,55 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:strokeColor="#BDBDBD"
+    app:strokeWidth="1dp">
 
-    <TextView
-        android:id="@+id/tv_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000"
-        android:textSize="16sp"/>
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#E0F7FA">
 
-    <TextView
-        android:id="@+id/tv_subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#666"
-        android:textSize="14sp"/>
+        <!-- Review title -->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reviewer Name"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1" />
 
-    <RatingBar
-        android:id="@+id/rb_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="5"
-        android:stepSize="0.5"
-        android:isIndicator="true"/>
-</LinearLayout>
+        <!-- Review subtitle / comment -->
+        <TextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This place was amazing!"
+            android:textColor="#666"
+            android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"/>
+
+        <!-- Rating bar -->
+        <RatingBar
+            android:id="@+id/rb_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:isIndicator="true"
+            android:theme="@style/Widget.AppCompat.RatingBar.Small"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

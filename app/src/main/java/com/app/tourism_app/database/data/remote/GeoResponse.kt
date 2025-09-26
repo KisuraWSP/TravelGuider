@@ -1,16 +1,14 @@
 package com.app.tourism_app.database.data.remote
 
-data class GeoApiResponse(
-    val features: List<Feature>
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class GeoapifyPlacesResponse(
+    val features: List<Feature> = emptyList()
 )
 
+@JsonClass(generateAdapter = true)
 data class Feature(
-    val properties: Properties,
-    val geometry: Geometry
-)
-
-data class Properties(
-    val name: String?,
-    val address_line1: String?,
-    val categories: String?
+    val properties: Properties? = null,
+    val geometry: Geometry? = null
 )

@@ -6,67 +6,115 @@
     android:layout_height="match_parent"
     android:background="#E0F7FA">
 
+    <!-- App/logo -->
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="247dp"
-        android:layout_height="242dp"
-        android:layout_marginTop="64dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:contentDescription="@string/app_name"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
         app:srcCompat="@drawable/logo" />
 
-    <EditText
-        android:id="@+id/enterUserNameField"
-        android:layout_width="305dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="36dp"
-        android:ems="10"
-        android:hint="@string/enter_user_name"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
+    <!-- Card container for inputs -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/formCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardUseCompatPadding="true"
+        app:strokeWidth="0dp"
+        app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <EditText
-        android:id="@+id/enterPasswordField"
-        android:layout_width="311dp"
-        android:layout_height="62dp"
-        android:ems="10"
-        android:hint="@string/enter_password"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/reEnterPasswordField"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.53"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enterUserNameField"
-        app:layout_constraintVertical_bias="0.263" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-    <EditText
-        android:id="@+id/reEnterPasswordField"
-        android:layout_width="311dp"
-        android:layout_height="73dp"
-        android:layout_marginBottom="28dp"
-        android:ems="10"
-        android:hint="Re-enter Password"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/createUserBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.53"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enterUserNameField"
-        app:layout_constraintVertical_bias="0.771" />
+            <!-- Username -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="filled"
+                app:boxStrokeColor="@android:color/darker_gray"
+                app:startIconDrawable="@android:drawable/ic_menu_myplaces">
 
-    <Button
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/enterUserNameField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_user_name"
+                    android:inputType="textPersonName"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:boxBackgroundMode="filled"
+                app:endIconMode="password_toggle"
+                app:startIconDrawable="@android:drawable/ic_lock_lock">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/enterPasswordField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_password"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Re-enter Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:boxBackgroundMode="filled"
+                app:endIconMode="password_toggle"
+                app:startIconDrawable="@android:drawable/ic_lock_lock">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/reEnterPasswordField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Re-enter Password"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Create button -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/createUserBtn"
-        android:layout_width="269dp"
-        android:layout_height="72dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/create_user"
+        android:textAllCaps="false"
+        app:cornerRadius="16dp"
+        app:icon="@android:drawable/ic_input_add"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enterUserNameField"
-        app:layout_constraintVertical_bias="0.846" />
+        app:layout_constraintTop_toBottomOf="@id/formCard"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

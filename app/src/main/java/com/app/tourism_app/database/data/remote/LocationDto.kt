@@ -34,6 +34,7 @@ data class LocationProperties(
     val imageUrl: String? = null
 )
 
+
 // Geometry field with coordinates
 @JsonClass(generateAdapter = true)
 data class Geometry(

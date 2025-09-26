@@ -1,15 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/favorites_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
-    android:background="#E0F7FA">
+    android:background="#E0F7FA"
+    android:padding="16dp">
 
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tv_favorites_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Favorites"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:paddingBottom="8dp"/>
+
+    <!-- RecyclerView for favorite places -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favorites"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_favorites_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"/>
 
-</FrameLayout>
+    <!-- Empty state placeholder (initially hidden, toggle in code) -->
+    <LinearLayout
+        android:id="@+id/empty_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tv_favorites_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:contentDescription="Empty favorites"
+            app:tint="#9E9E9E" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No favorites yet"
+            android:textSize="16sp"
+            android:textColor="#666"
+            android:paddingTop="8dp"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

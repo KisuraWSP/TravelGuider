@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="#E0F7FA">
 
     <ImageView
         android:id="@+id/img_onboard"

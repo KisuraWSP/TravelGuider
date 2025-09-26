@@ -1,62 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/place_detail_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp">
+    android:background="#E0F7FA"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-        <ImageView
-            android:id="@+id/img_place"
+        <!-- Place image in a rounded Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:scaleType="centerCrop"/>
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp">
 
+            <ImageView
+                android:id="@+id/img_place"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/app_name"
+                app:srcCompat="@drawable/ic_placeholder_image" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Title -->
         <TextView
             android:id="@+id/tv_place_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:textSize="20sp"
-            android:paddingTop="8dp"/>
+            android:textSize="22sp"
+            android:textColor="@android:color/black"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:fontFamily="sans-serif-medium" />
 
+        <!-- Description -->
         <TextView
             android:id="@+id/tv_place_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="6dp"/>
+            android:textSize="15sp"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@android:color/black"
+            android:paddingBottom="12dp" />
 
-        <Button
-            android:id="@+id/btn_write_review"
+        <!-- Buttons row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Write a review"
-            android:layout_marginTop="12dp"/>
-        <Button
-            android:id="@+id/btn_favorite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add to favorites"
-            android:layout_marginTop="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2"
+            android:layout_marginTop="8dp">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_write_review"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="Write a review"
+                style="@style/Widget.Material3.Button.TonalButton"
+                app:icon="@android:drawable/ic_menu_edit"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_favorite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Add to favorites"
+                app:cornerRadius="16dp"
+                app:icon="@android:drawable/btn_star_big_off"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"/>
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#BDBDBD"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Reviews label -->
         <TextView
             android:id="@+id/tv_reviews_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Reviews"
             android:textStyle="bold"
-            android:paddingTop="12dp"/>
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:paddingBottom="8dp" />
 
+        <!-- Reviews list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_reviews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
-
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="32dp"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

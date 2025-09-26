@@ -90,15 +90,35 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                     text = query // our new text search param
                 )
 
-                val list = resp.features.map { dto ->
-                    LocationUi(
-                        id = dto.properties.hashCode().toLong(),
-                        title = dto.properties.name ?: "Unknown",
-                        description = dto.properties.description ?: "",
-                        imageUrl = dto.properties.imageUrl ?: "",
-                        reviews = emptyList()
-                    )
-                }.distinctBy { it.title + it.description } // simple dedupe heuristic
+                val list = resp.features
+                    .mapNotNull { f ->
+                        val p = f.properties ?: return@mapNotNull null   // <- guard null
+
+                        val title = p.name ?: p.formatted ?: "Unknown"
+
+                        val desc = buildString {
+                            append(p.formatted ?: "")
+                            val extra = listOfNotNull(p.city, p.country)
+                                .filter { it.isNotBlank() }
+                            if (extra.isNotEmpty()) {
+                                if (isNotEmpty()) append("\n")
+                                append(extra.joinToString(", "))
+                            }
+                        }.trim()
+
+                        val stableId = p.placeId?.hashCode()?.toLong()
+                            ?: title.hashCode().toLong()
+
+                        LocationUi(
+                            id = stableId,
+                            title = title,
+                            description = desc,
+                            imageUrl = "",          // Geoapify doesn't provide images
+                            reviews = emptyList()
+                        )
+                    }
+                    .distinctBy { it.id }
+
 
                 Log.d("SearchFragment", "Search '$query' -> ${list.size} results")
                 adapter.submitList(list)

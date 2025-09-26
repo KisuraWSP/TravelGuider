@@ -4,12 +4,14 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ApiService {
-    @GET("places")
+    // Geoapify Places (supports both categories+filter and text search)
+    // Docs style: https://api.geoapify.com/v2/places
+    @GET("v2/places")
     suspend fun getLocations(
-        @Query("categories") categories: String,
-        @Query("filter") filter: String,
-        @Query("limit") limit: Int,
-        @Query("apiKey") apiKey: String,
-        @Query("text") text: String? = null
-    ): PlacesResponse
+        @Query("categories") categories: String? = null,
+        @Query("filter") filter: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("text") text: String? = null,
+        @Query("apiKey") apiKey: String
+    ): GeoapifyPlacesResponse
 }

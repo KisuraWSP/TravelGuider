@@ -5,31 +5,50 @@
     android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:background="#E0F7FA">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/top_appbar"
+    <!-- AppBar with MaterialToolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:title="@string/app_name"
-        app:layout_scrollFlags="scroll|enterAlways" />
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:background="?attr/colorSurface"
+        app:elevation="4dp">
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/top_appbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/app_name"
+            app:titleCentered="true"
+            app:navigationIconTint="@android:color/black"
+            app:titleTextColor="@android:color/black"
+            app:layout_scrollFlags="scroll|enterAlways"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main content area (auto-resizes around bottom nav, scrolls under AppBar) -->
     <FrameLayout
         android:id="@+id/main_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_marginBottom="72dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_gravity="center"
-        android:layout_weight="1" />
+        app:layout_dodgeInsetEdges="bottom"
+        android:clipToPadding="false"/>
 
+    <!-- Bottom navigation (Coordinator-aware) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/menu_bottom_nav"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground" />
+        android:background="?attr/colorSurface"
+        app:menu="@menu/menu_bottom_nav"
+        app:itemIconTint="@color/selector_bottom_nav_item"
+        app:itemTextColor="@color/selector_bottom_nav_item"
+        app:itemRippleColor="@color/selector_ripple"
+        app:labelVisibilityMode="labeled"
+        app:elevation="8dp"
+        app:layout_insetEdge="bottom"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

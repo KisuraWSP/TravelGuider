@@ -1,50 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/profile_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#E0F7FA">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:padding="20dp">
 
-        <ImageView
-            android:id="@+id/img_avatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:contentDescription="Avatar"/>
+        <!-- Avatar inside a Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            app:cardCornerRadius="70dp"
+            app:cardElevation="6dp">
 
+            <ImageView
+                android:id="@+id/img_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Avatar"
+                android:src="@drawable/ic_placeholder_image"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Username -->
         <TextView
             android:id="@+id/tv_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Username"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:paddingTop="12dp"/>
+            android:textColor="@android:color/black"
+            android:paddingTop="12dp"
+            android:fontFamily="sans-serif-medium"/>
 
-        <Button
+        <!-- Edit Profile Button -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_edit_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Edit Profile"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp"
+            app:icon="@android:drawable/ic_menu_edit"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
             android:layout_marginTop="12dp"/>
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"/>
-        <!-- quick links -->
+            android:background="#BDBDBD"
+            android:layout_marginTop="24dp"/>
+
+        <!-- Quick links -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="8dp">
+            android:layout_marginTop="8dp">
 
-            <TextView android:id="@+id/tv_my_reviews" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="My Reviews" android:padding="12dp"/>
-            <TextView android:id="@+id/tv_settings" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Settings" android:padding="12dp"/>
+            <!-- My Reviews -->
+            <LinearLayout
+                android:id="@+id/tv_my_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_agenda"
+                    app:tint="@android:color/darker_gray" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="My Reviews"
+                    android:textSize="16sp"
+                    android:paddingStart="12dp"
+                    android:textColor="@android:color/black"/>
+            </LinearLayout>
+
+            <!-- Settings -->
+            <LinearLayout
+                android:id="@+id/tv_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_preferences"
+                    app:tint="@android:color/darker_gray" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Settings"
+                    android:textSize="16sp"
+                    android:paddingStart="12dp"
+                    android:textColor="@android:color/black"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

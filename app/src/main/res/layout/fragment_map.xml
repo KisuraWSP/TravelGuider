@@ -1,25 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/map_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#E0F7FA">
 
-    <!-- If you use SupportMapFragment, you'll add it from the fragment manager in code.
-         Alternatively place a MapView here if you prefer to inflate it directly. -->
+    <!-- Map container -->
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_my_location"
+    <!-- Top bar (title/search placeholder) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/map_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="6dp"
+        android:backgroundTint="@android:color/white"
+        android:padding="12dp"
+        android:layout_gravity="top">
+
+        <TextView
+            android:id="@+id/tv_map_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:contentDescription="My location"
-            android:src="@drawable/ic_my_location" />
-    </FrameLayout>
+            android:text="Explore Map"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- My location button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_my_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:contentDescription="My location"
+        app:backgroundTint="@color/purple_500"
+        app:tint="@android:color/white"
+        app:srcCompat="@drawable/ic_my_location" />
 
 </FrameLayout>
