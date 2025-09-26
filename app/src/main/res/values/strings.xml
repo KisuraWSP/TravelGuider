@@ -9,5 +9,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="onboarding_image">onboarding\n</string>
     <string name="location_image" />
-    <string name="google_maps_key">AIzaSyBBTu1Rpcxc8nPPGflKkPGWIznMe6UenVA</string>
+    <string name="map">AIzaSyBBTu1Rpcxc8nPPGflKkPGWIznMe6UenVA</string>
 </resources>

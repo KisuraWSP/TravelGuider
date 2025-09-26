@@ -161,7 +161,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                         categories = "tourism.sights",
                         filter = "rect:79.6617,5.9180,81.9090,9.8341", // Sri Lanka bounding box example
                         limit = 50,
-                        apiKey = "YOUR_API_KEY_HERE"
+                        apiKey = "ff8eac3934aa4b74bd1229543e598951"
                     )
                 }
 
