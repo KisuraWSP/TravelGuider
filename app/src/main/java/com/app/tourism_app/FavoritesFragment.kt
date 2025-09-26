@@ -1,59 +1,49 @@
 package com.app.tourism_app
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.app.tourism_app.database.data.ui.FavoriteAdapter
+import com.app.tourism_app.database.data.local.AppDatabase
+import com.app.tourism_app.database.model.Favorite
+import com.app.tourism_app.database.repository.Repository
+import com.app.tourism_app.database.data.remote.NetworkModule
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoritesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class FavoritesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var adapter: FavoriteAdapter
+    private lateinit var repository: Repository
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorites, container, false)
-    }
+        val rv = view.findViewById<RecyclerView>(R.id.rv_favorites)
+        val db = AppDatabase.getInstance(requireContext())
+        repository = Repository(NetworkModule.provideApiService(), db.reviewDao(), db.favoriteDao())
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavoritesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoritesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+        adapter = FavoriteAdapter { fav ->
+            // open PlaceDetailActivity for this favorite
+            val intent = Intent(requireContext(), PlaceDetailActivity::class.java).apply {
+                putExtra("place_id", fav.placeId)
+                putExtra("place_title", fav.title)
+                putExtra("place_desc", fav.description)
+                putExtra("place_image", fav.imageUrl)
             }
+            startActivity(intent)
+        }
+        rv.layoutManager = LinearLayoutManager(requireContext())
+        rv.adapter = adapter
+
+        // collect favorites
+        viewLifecycleOwner.lifecycleScope.launch {
+            repository.favoritesFlow().collect { list ->
+                adapter.submitList(list)
+            }
+        }
     }
 }

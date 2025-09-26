@@ -41,15 +41,20 @@ class WriteReviewActivity : AppCompatActivity() {
 
         // Repo + ViewModel
         val reviewDao = AppDatabase.getInstance(this).reviewDao()
+        val favoriteDao = AppDatabase.getInstance(this).favoriteDao()
         repository = Repository(
             api = com.app.tourism_app.database.data.remote.NetworkModule.provideApiService(),
-            reviewDao = reviewDao
+            reviewDao = reviewDao,
+            favoriteDao = favoriteDao
         )
 
         val userDb = UserDatabase.getInstance(this)
         userRepository = UserRepository(userDb)
         val userFactory = com.app.tourism_app.database.view.UserViewModelFactory(userRepository)
-        userViewModel = ViewModelProvider(this, userFactory).get(com.app.tourism_app.database.view.UserViewModel::class.java)
+        userViewModel = ViewModelProvider(
+            this,
+            userFactory
+        ).get(com.app.tourism_app.database.view.UserViewModel::class.java)
 
         btnSubmit.setOnClickListener {
             val rating = ratingBar.rating.toInt()
@@ -70,10 +75,15 @@ class WriteReviewActivity : AppCompatActivity() {
                         comment = comment
                     )
                     repository.addReview(review)
-                    Toast.makeText(this@WriteReviewActivity, "Review added!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WriteReviewActivity, "Review added!", Toast.LENGTH_SHORT)
+                        .show()
                     finish()
                 } else {
-                    Toast.makeText(this@WriteReviewActivity, "User not logged in", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@WriteReviewActivity,
+                        "User not logged in",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

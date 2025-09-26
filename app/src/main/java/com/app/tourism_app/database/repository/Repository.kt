@@ -1,9 +1,11 @@
 package com.app.tourism_app.database.repository
 
 import android.util.Log
+import com.app.tourism_app.database.dao.FavoriteDao
 import com.app.tourism_app.database.dao.ReviewDao
 import com.app.tourism_app.database.data.remote.ApiService
 import com.app.tourism_app.database.data.ui.LocationUi
+import com.app.tourism_app.database.model.Favorite
 import com.app.tourism_app.database.model.Review
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -11,7 +13,8 @@ import kotlinx.coroutines.flow.flow
 
 class Repository(
     private val api: ApiService,
-    private val reviewDao: ReviewDao
+    private val reviewDao: ReviewDao,
+    private val favoriteDao: FavoriteDao
 ) {
 
     // Fetch remote locations once and merge with reviews dynamically
@@ -59,4 +62,11 @@ class Repository(
 
     fun reviewsForLocation(locationId: Long): Flow<List<Review>> =
         reviewDao.reviewsForLocation(locationId)
+
+    // Favorites
+    suspend fun addFavorite(fav: Favorite) = favoriteDao.insert(fav)
+    suspend fun removeFavorite(fav: Favorite) = favoriteDao.delete(fav)
+    fun favoritesFlow(): Flow<List<Favorite>> = favoriteDao.getAllFavorites()
+    suspend fun isFavorite(placeId: Long): Boolean = favoriteDao.isFavorite(placeId)
+    suspend fun getFavoriteById(placeId: Long): Favorite? = favoriteDao.getFavoriteById(placeId)
 }

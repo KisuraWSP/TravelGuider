@@ -11,7 +11,7 @@ class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Fac
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val api = NetworkModule.provideApiService()
         val db = AppDatabase.getInstance(context)
-        val repo = Repository(api, db.reviewDao())
+        val repo = Repository(api, db.reviewDao(), db.favoriteDao())
         @Suppress("UNCHECKED_CAST")
         return HomeViewModel(repo) as T
     }

@@ -37,6 +37,12 @@
             android:layout_height="wrap_content"
             android:text="Write a review"
             android:layout_marginTop="12dp"/>
+        <Button
+            android:id="@+id/btn_favorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add to favorites"
+            android:layout_marginTop="8dp"/>
 
         <TextView
             android:id="@+id/tv_reviews_label"

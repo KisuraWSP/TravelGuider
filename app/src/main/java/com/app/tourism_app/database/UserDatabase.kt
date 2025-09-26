@@ -14,22 +14,34 @@ abstract class UserDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
     companion object {
-        @Volatile
-        private var instance: UserDatabase? = null
+        @Volatile private var INSTANCE: UserDatabase? = null
 
         fun getInstance(context: Context): UserDatabase =
-            instance ?: synchronized(this) {
-                instance ?: buildDatabase(context).also { instance = it }
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext, UserDatabase::class.java, "user_database.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2) // register migration
                 .build()
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE users ADD COLUMN is_logged_in INTEGER NOT NULL DEFAULT 0")
+                // If you only added a new table (Favorite), create it here.
+                // Replace the column definitions with the exact schema of your Favorite entity.
+
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `Favorite` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `place_id` INTEGER NOT NULL,
+                        `title` TEXT,
+                        `imageUrl` TEXT,
+                        `userId` TEXT
+                    )
+                """.trimIndent())
+
+                // If you modified any existing tables, alter them here (SQLite doesn't support ALTER add multiple columns easily).
             }
         }
     }

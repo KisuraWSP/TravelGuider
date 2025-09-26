@@ -11,11 +11,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.tourism_app.database.UserDatabase
 import com.app.tourism_app.database.data.local.AppDatabase
 import com.app.tourism_app.database.data.ui.ReviewAdapter
+import com.app.tourism_app.database.model.Favorite
 import com.app.tourism_app.database.repository.Repository
 import com.app.tourism_app.database.repository.UserRepository
 import com.bumptech.glide.Glide
@@ -33,6 +35,7 @@ class PlaceDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_detail)
 
+        // edge-to-edge padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.place_detail_root)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -44,24 +47,8 @@ class PlaceDetailActivity : AppCompatActivity() {
         val tvDesc = findViewById<TextView>(R.id.tv_place_desc)
         val imgPlace = findViewById<ImageView>(R.id.img_place)
         val btnWriteReview = findViewById<Button>(R.id.btn_write_review)
+        val btnFavorite = findViewById<Button>(R.id.btn_favorite) // add this to layout
         val rvReviews = findViewById<RecyclerView>(R.id.rv_reviews)
-
-        // Repos & ViewModel
-        val reviewDao = AppDatabase.getInstance(this).reviewDao()
-        repository = Repository(
-            api = com.app.tourism_app.database.data.remote.NetworkModule.provideApiService(),
-            reviewDao = reviewDao
-        )
-
-        val userDb = UserDatabase.getInstance(this)
-        userRepository = UserRepository(userDb)
-        val userFactory = com.app.tourism_app.database.view.UserViewModelFactory(userRepository)
-        userViewModel = ViewModelProvider(this, userFactory).get(com.app.tourism_app.database.view.UserViewModel::class.java)
-
-        // Reviews Recycler
-        reviewAdapter = ReviewAdapter()
-        rvReviews.adapter = reviewAdapter
-        rvReviews.layoutManager = LinearLayoutManager(this)
 
         // Intent extras
         val placeId = intent.getLongExtra("place_id", 0L)
@@ -73,24 +60,87 @@ class PlaceDetailActivity : AppCompatActivity() {
         tvDesc.text = desc
         imageUrl?.let { Glide.with(this).load(it).centerCrop().into(imgPlace) }
 
-        // Collect reviews for this place (live)
+        // Repos & ViewModel (make sure your Repository constructor accepts favoriteDao)
+        val db = AppDatabase.getInstance(this)
+        val reviewDao = db.reviewDao()
+        val favDao = db.favoriteDao()
+        repository = Repository(
+            api = com.app.tourism_app.database.data.remote.NetworkModule.provideApiService(),
+            reviewDao = reviewDao,
+            favoriteDao = favDao
+        )
+
+        val userDb = UserDatabase.getInstance(this)
+        userRepository = UserRepository(userDb)
+        val userFactory = com.app.tourism_app.database.view.UserViewModelFactory(userRepository)
+        userViewModel = ViewModelProvider(this, userFactory)
+            .get(com.app.tourism_app.database.view.UserViewModel::class.java)
+
+        // Reviews Recycler
+        reviewAdapter = ReviewAdapter()
+        rvReviews.adapter = reviewAdapter
+        rvReviews.layoutManager = LinearLayoutManager(this)
+
+        // Collect reviews & update adapter using repeatOnLifecycle for safety
         lifecycleScope.launch {
-            repository.reviewsForLocation(placeId).collect { reviews ->
-                reviewAdapter.submitList(reviews)
+            lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                launch {
+                    repository.reviewsForLocation(placeId).collect { reviews ->
+                        reviewAdapter.submitList(reviews)
+                    }
+                }
             }
         }
 
-        btnWriteReview.setOnClickListener {
-            // short-lived check: get currently logged-in user from the state flow
+        // Favorite button: initialize text and keep it updated on user action
+        lifecycleScope.launch {
+            // initial state
+            val isFav = repository.isFavorite(placeId)
+            btnFavorite.text = if (isFav) "Remove from favorites" else "Add to favorites"
+        }
+
+        btnFavorite.setOnClickListener {
             lifecycleScope.launch {
-                val currentUser = userViewModel.currentUser.first()
+                val existing = repository.getFavoriteById(placeId)
+                if (existing != null) {
+                    // remove
+                    repository.removeFavorite(existing)
+                    btnFavorite.text = "Add to favorites"
+                    Toast.makeText(this@PlaceDetailActivity, "Removed from favorites", Toast.LENGTH_SHORT).show()
+                } else {
+                    // add
+                    val fav = Favorite(
+                        placeId = placeId,
+                        title = title,
+                        description = desc.takeIf { it.isNotBlank() },
+                        imageUrl = imageUrl
+                    )
+                    repository.addFavorite(fav)
+                    btnFavorite.text = "Remove from favorites"
+                    Toast.makeText(this@PlaceDetailActivity, "Added to favorites", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        // Write review: only allow when a user is logged in
+        btnWriteReview.setOnClickListener {
+            lifecycleScope.launch {
+                // userViewModel.currentUser is expected to be a StateFlow<User?> (or similar). We use .first() to get current snapshot.
+                val currentUser = try {
+                    userViewModel.currentUser.first()
+                } catch (t: Throwable) {
+                    null
+                }
+
                 if (currentUser != null) {
-                    startActivity(Intent(this@PlaceDetailActivity, WriteReviewActivity::class.java).apply {
+                    // Launch write-review screen
+                    val intent = Intent(this@PlaceDetailActivity, WriteReviewActivity::class.java).apply {
                         putExtra("place_id", placeId)
                         putExtra("place_title", title)
                         putExtra("place_desc", desc)
                         putExtra("place_image", imageUrl)
-                    })
+                    }
+                    startActivity(intent)
                 } else {
                     Toast.makeText(this@PlaceDetailActivity, "You must be logged in to write a review", Toast.LENGTH_SHORT).show()
                 }
