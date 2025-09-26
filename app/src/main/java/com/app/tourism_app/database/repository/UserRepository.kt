@@ -1,6 +1,9 @@
 package com.app.tourism_app.database.repository
 
+import android.content.Context
 import com.app.tourism_app.database.UserDatabase
+import com.app.tourism_app.database.dao.UserDao
+import com.app.tourism_app.database.data.local.AppDatabase
 import com.app.tourism_app.database.model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -46,4 +49,5 @@ class UserRepository(private val db: UserDatabase) {
 
     // Utility: update user row
     suspend fun updateUser(user: User) = dao.updateUser(user)
+
 }
