@@ -14,7 +14,3 @@ data class Properties(
     val address_line1: String?,
     val categories: String?
 )
-
-data class Geometry(
-    val coordinates: List<Double>
-)

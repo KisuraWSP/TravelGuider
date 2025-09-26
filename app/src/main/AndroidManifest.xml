@@ -3,6 +3,8 @@
     package="com.app.tourism_app">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tourism_App">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
         <!-- Initial Activity that is launched when we start the app -->
         <activity
