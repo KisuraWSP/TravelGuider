@@ -9,6 +9,7 @@ interface ApiService {
         @Query("categories") categories: String,
         @Query("filter") filter: String,
         @Query("limit") limit: Int,
-        @Query("apiKey") apiKey: String
+        @Query("apiKey") apiKey: String,
+        @Query("text") text: String? = null
     ): PlacesResponse
 }

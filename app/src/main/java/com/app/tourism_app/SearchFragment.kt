@@ -1,59 +1,115 @@
 package com.app.tourism_app
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.app.tourism_app.database.data.remote.NetworkModule
+import com.app.tourism_app.database.data.ui.LocationUi
+import com.app.tourism_app.database.data.ui.home.LocationsAdapter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class SearchFragment : Fragment(R.layout.fragment_search) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SearchFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class SearchFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var adapter: LocationsAdapter
+    private val api = NetworkModule.provideApiService()
+    private var searchJob: Job? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false)
-    }
+        val sv = view.findViewById<SearchView>(R.id.search_view)
+        val rv = view.findViewById<RecyclerView>(R.id.rv_search_results)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SearchFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SearchFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+        adapter = LocationsAdapter { loc ->
+            // open PlaceDetailActivity with extras
+            val intent = Intent(requireContext(), PlaceDetailActivity::class.java).apply {
+                putExtra("place_id", loc.id)
+                putExtra("place_title", loc.title)
+                putExtra("place_desc", loc.description ?: "")
+                putExtra("place_image", loc.imageUrl)
             }
+            startActivity(intent)
+        }
+
+        rv.layoutManager = LinearLayoutManager(requireContext())
+        rv.adapter = adapter
+
+        // Optional: prefill or show popular / default results if you want
+        // otherwise the list will be blank until the user types
+
+        // Debounce search input:
+        sv.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { doSearch(it.trim()) }
+                sv.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // debounce typing: cancel previous job and launch delayed search
+                searchJob?.cancel()
+                val q = newText?.trim()
+                if (q.isNullOrEmpty()) {
+                    adapter.submitList(emptyList())
+                    return true
+                }
+                searchJob = viewLifecycleOwner.lifecycleScope.launch {
+                    // small debounce (300ms)
+                    delay(300)
+                    if (!isActive) return@launch
+                    doSearch(q)
+                }
+                return true
+            }
+        })
+    }
+
+    private fun doSearch(query: String) {
+        // run network call safely in coroutine
+        viewLifecycleOwner.lifecycleScope.launch {
+            // optional: show loading UI (not included here)
+            try {
+                // Example bounding box for Sri Lanka (your filter earlier) — adjust if needed
+                val filter = "rect:79.6617,5.9180,81.9090,9.8341"
+                val limit = 50
+
+                val resp = api.getLocations(
+                    categories = "tourism.sights",
+                    filter = filter,
+                    limit = limit,
+                    apiKey = "ff8eac3934aa4b74bd1229543e598951",
+                    text = query // our new text search param
+                )
+
+                val list = resp.features.map { dto ->
+                    LocationUi(
+                        id = dto.properties.hashCode().toLong(),
+                        title = dto.properties.name ?: "Unknown",
+                        description = dto.properties.description ?: "",
+                        imageUrl = dto.properties.imageUrl ?: "",
+                        reviews = emptyList()
+                    )
+                }.distinctBy { it.title + it.description } // simple dedupe heuristic
+
+                Log.d("SearchFragment", "Search '$query' -> ${list.size} results")
+                adapter.submitList(list)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                // show simple error (you can show a Snackbar/Toast/UI)
+                // Toast.makeText(requireContext(), "Search failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                adapter.submitList(emptyList())
+            } finally {
+                // hide loading UI if you had one
+            }
+        }
     }
 }
