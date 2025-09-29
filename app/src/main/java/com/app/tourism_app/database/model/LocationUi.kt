@@ -1,6 +1,4 @@
-package com.app.tourism_app.database.data.ui
-
-import com.app.tourism_app.database.model.Review
+package com.app.tourism_app.database.model
 
 data class LocationUi(
     val id: Long,

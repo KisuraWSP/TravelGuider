@@ -1,16 +1,24 @@
-package com.app.tourism_app
+package com.app.tourism_app.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.app.tourism_app.database.data.local.AppDatabase
+import com.app.tourism_app.R
+import com.app.tourism_app.database.data.local.UserDatabase
 import com.app.tourism_app.database.dao.UserDao
+import com.app.tourism_app.database.data.local.AppDatabase
 import com.app.tourism_app.database.model.User
 import com.app.tourism_app.database.repository.UserRepository
 import com.app.tourism_app.database.view.UserViewModel
@@ -27,10 +35,10 @@ class ProfileFragment : Fragment() {
     private lateinit var rowSettings: LinearLayout
 
     private val repository: UserRepository by lazy {
-        val appDb = AppDatabase.getInstance(requireContext().applicationContext)
+        val appDb = AppDatabase.Companion.getInstance(requireContext().applicationContext)
 
         // Create adapter to satisfy UserDatabase
-        object : com.app.tourism_app.database.UserDatabase() {
+        object : UserDatabase() {
             override fun userDao(): UserDao = appDb.userDao()
             override fun clearAllTables() = appDb.clearAllTables()
             override fun createInvalidationTracker() = appDb.invalidationTracker

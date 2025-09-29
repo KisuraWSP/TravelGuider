@@ -1,4 +1,4 @@
-package com.app.tourism_app.database.data.ui.home
+package com.app.tourism_app.database.data.ui
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.app.tourism_app.R
-import com.app.tourism_app.database.data.ui.LocationUi
+import com.app.tourism_app.database.model.LocationUi
 
 class LocationsAdapter(
     private val onItemClick: (LocationUi) -> Unit

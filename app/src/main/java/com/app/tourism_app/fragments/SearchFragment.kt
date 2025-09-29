@@ -1,4 +1,4 @@
-package com.app.tourism_app
+package com.app.tourism_app.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.tourism_app.activities.PlaceDetailActivity
+import com.app.tourism_app.R
 import com.app.tourism_app.database.data.remote.NetworkModule
-import com.app.tourism_app.database.data.ui.LocationUi
-import com.app.tourism_app.database.data.ui.home.LocationsAdapter
+import com.app.tourism_app.database.model.LocationUi
+import com.app.tourism_app.database.data.ui.LocationsAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

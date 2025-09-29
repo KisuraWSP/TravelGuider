@@ -5,7 +5,7 @@ import com.app.tourism_app.database.dao.FavoriteDao
 import com.app.tourism_app.database.dao.ReviewDao
 import com.app.tourism_app.database.data.remote.ApiService
 import com.app.tourism_app.database.data.remote.Feature
-import com.app.tourism_app.database.data.ui.LocationUi
+import com.app.tourism_app.database.model.LocationUi
 import com.app.tourism_app.database.model.Favorite
 import com.app.tourism_app.database.model.Review
 import kotlinx.coroutines.flow.Flow

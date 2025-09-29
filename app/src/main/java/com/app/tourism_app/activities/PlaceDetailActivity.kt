@@ -1,4 +1,4 @@
-package com.app.tourism_app
+package com.app.tourism_app.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,17 +9,23 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.tourism_app.database.UserDatabase
+import com.app.tourism_app.R
+import com.app.tourism_app.database.data.local.UserDatabase
 import com.app.tourism_app.database.data.local.AppDatabase
+import com.app.tourism_app.database.data.remote.NetworkModule
 import com.app.tourism_app.database.data.ui.ReviewAdapter
 import com.app.tourism_app.database.model.Favorite
 import com.app.tourism_app.database.repository.Repository
 import com.app.tourism_app.database.repository.UserRepository
+import com.app.tourism_app.database.view.UserViewModel
+import com.app.tourism_app.database.view.UserViewModelFactory
+import com.app.tourism_app.activities.WriteReviewActivity
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -29,7 +35,7 @@ class PlaceDetailActivity : AppCompatActivity() {
     private lateinit var reviewAdapter: ReviewAdapter
     private lateinit var repository: Repository
     private lateinit var userRepository: UserRepository
-    private lateinit var userViewModel: com.app.tourism_app.database.view.UserViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,20 +67,20 @@ class PlaceDetailActivity : AppCompatActivity() {
         imageUrl?.let { Glide.with(this).load(it).centerCrop().into(imgPlace) }
 
         // Repos & ViewModel (make sure your Repository constructor accepts favoriteDao)
-        val db = AppDatabase.getInstance(this)
+        val db = AppDatabase.Companion.getInstance(this)
         val reviewDao = db.reviewDao()
         val favDao = db.favoriteDao()
         repository = Repository(
-            api = com.app.tourism_app.database.data.remote.NetworkModule.provideApiService(),
+            api = NetworkModule.provideApiService(),
             reviewDao = reviewDao,
             favoriteDao = favDao
         )
 
-        val userDb = UserDatabase.getInstance(this)
+        val userDb = UserDatabase.Companion.getInstance(this)
         userRepository = UserRepository(userDb)
-        val userFactory = com.app.tourism_app.database.view.UserViewModelFactory(userRepository)
+        val userFactory = UserViewModelFactory(userRepository)
         userViewModel = ViewModelProvider(this, userFactory)
-            .get(com.app.tourism_app.database.view.UserViewModel::class.java)
+            .get(UserViewModel::class.java)
 
         // Reviews Recycler
         reviewAdapter = ReviewAdapter()
@@ -83,7 +89,7 @@ class PlaceDetailActivity : AppCompatActivity() {
 
         // Collect reviews & update adapter using repeatOnLifecycle for safety
         lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     repository.reviewsForLocation(placeId).collect { reviews ->
                         reviewAdapter.submitList(reviews)

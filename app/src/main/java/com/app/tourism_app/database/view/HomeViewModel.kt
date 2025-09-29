@@ -1,8 +1,8 @@
-package com.app.tourism_app.database.data.ui.home
+package com.app.tourism_app.database.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.tourism_app.database.data.ui.LocationUi
+import com.app.tourism_app.database.model.LocationUi
 import com.app.tourism_app.database.model.Review
 import com.app.tourism_app.database.repository.Repository
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +16,7 @@ class HomeViewModel(private val repo: Repository) : ViewModel() {
     val locations: StateFlow<List<LocationUi>> = repo.locationsWithReviews()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Lazily,
+            started = SharingStarted.Companion.Lazily,
             initialValue = emptyList() // RecyclerView sees empty list initially
         )
 

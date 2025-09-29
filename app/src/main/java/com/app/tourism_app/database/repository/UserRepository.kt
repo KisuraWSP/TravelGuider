@@ -1,7 +1,7 @@
 package com.app.tourism_app.database.repository
 
 import android.content.Context
-import com.app.tourism_app.database.UserDatabase
+import com.app.tourism_app.database.data.local.UserDatabase
 import com.app.tourism_app.database.dao.UserDao
 import com.app.tourism_app.database.data.local.AppDatabase
 import com.app.tourism_app.database.model.User

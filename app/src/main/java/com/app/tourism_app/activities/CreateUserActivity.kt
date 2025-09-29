@@ -1,4 +1,4 @@
-package com.app.tourism_app
+package com.app.tourism_app.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,7 +7,9 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.app.tourism_app.database.UserDatabase
+import com.app.tourism_app.activities.MainActivity
+import com.app.tourism_app.R
+import com.app.tourism_app.database.data.local.UserDatabase
 import com.app.tourism_app.database.model.User
 import com.app.tourism_app.database.repository.UserRepository
 import com.app.tourism_app.database.view.UserViewModel
@@ -25,9 +27,10 @@ class CreateUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_user)
 
-        val userDatabase = UserDatabase.getInstance(applicationContext)
+        val userDatabase = UserDatabase.Companion.getInstance(applicationContext)
         user_repository = UserRepository(userDatabase)
-        user_view_model = ViewModelProvider(this, UserViewModelFactory(user_repository)).get(UserViewModel::class.java)
+        user_view_model = ViewModelProvider(this, UserViewModelFactory(user_repository)).get(
+            UserViewModel::class.java)
 
 
         user_name_field = findViewById(R.id.enterUserNameField)

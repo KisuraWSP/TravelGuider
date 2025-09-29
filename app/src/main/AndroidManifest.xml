@@ -22,7 +22,7 @@
 
         <!-- Initial Activity that is launched when we start the app -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +33,7 @@
 
         <!-- Sub Activities that the app can do -->
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -42,19 +42,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".WriteReviewActivity"
+            android:name=".activities.WriteReviewActivity"
             android:exported="false" />
         <activity
-            android:name=".PlaceDetailActivity"
+            android:name=".activities.PlaceDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".OnboardingActivity"
+            android:name=".activities.OnboardingActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateUserActivity"
+            android:name=".activities.CreateUserActivity"
             android:exported="false" />
 
     </application>

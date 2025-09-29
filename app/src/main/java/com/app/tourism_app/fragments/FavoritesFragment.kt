@@ -1,4 +1,4 @@
-package com.app.tourism_app
+package com.app.tourism_app.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,11 +7,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.tourism_app.database.data.ui.FavoriteAdapter
+import com.app.tourism_app.activities.PlaceDetailActivity
+import com.app.tourism_app.R
 import com.app.tourism_app.database.data.local.AppDatabase
-import com.app.tourism_app.database.model.Favorite
-import com.app.tourism_app.database.repository.Repository
 import com.app.tourism_app.database.data.remote.NetworkModule
+import com.app.tourism_app.database.data.ui.FavoriteAdapter
+import com.app.tourism_app.database.repository.Repository
 import kotlinx.coroutines.launch
 
 class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
@@ -23,7 +24,7 @@ class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
         super.onViewCreated(view, savedInstanceState)
 
         val rv = view.findViewById<RecyclerView>(R.id.rv_favorites)
-        val db = AppDatabase.getInstance(requireContext())
+        val db = AppDatabase.Companion.getInstance(requireContext())
         repository = Repository(NetworkModule.provideApiService(), db.reviewDao(), db.favoriteDao())
 
         adapter = FavoriteAdapter { fav ->

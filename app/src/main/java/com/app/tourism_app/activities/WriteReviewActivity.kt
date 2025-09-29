@@ -1,4 +1,4 @@
-package com.app.tourism_app
+package com.app.tourism_app.activities
 
 import android.os.Bundle
 import android.widget.Button
@@ -10,11 +10,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.app.tourism_app.database.UserDatabase
+import com.app.tourism_app.R
+import com.app.tourism_app.database.data.local.UserDatabase
 import com.app.tourism_app.database.data.local.AppDatabase
+import com.app.tourism_app.database.data.remote.NetworkModule
 import com.app.tourism_app.database.model.Review
 import com.app.tourism_app.database.repository.Repository
 import com.app.tourism_app.database.repository.UserRepository
+import com.app.tourism_app.database.view.UserViewModel
+import com.app.tourism_app.database.view.UserViewModelFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -22,7 +26,7 @@ class WriteReviewActivity : AppCompatActivity() {
 
     private lateinit var repository: Repository
     private lateinit var userRepository: UserRepository
-    private lateinit var userViewModel: com.app.tourism_app.database.view.UserViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,21 +44,21 @@ class WriteReviewActivity : AppCompatActivity() {
         val placeId = intent.getLongExtra("place_id", 0L)
 
         // Repo + ViewModel
-        val reviewDao = AppDatabase.getInstance(this).reviewDao()
-        val favoriteDao = AppDatabase.getInstance(this).favoriteDao()
+        val reviewDao = AppDatabase.Companion.getInstance(this).reviewDao()
+        val favoriteDao = AppDatabase.Companion.getInstance(this).favoriteDao()
         repository = Repository(
-            api = com.app.tourism_app.database.data.remote.NetworkModule.provideApiService(),
+            api = NetworkModule.provideApiService(),
             reviewDao = reviewDao,
             favoriteDao = favoriteDao
         )
 
-        val userDb = UserDatabase.getInstance(this)
+        val userDb = UserDatabase.Companion.getInstance(this)
         userRepository = UserRepository(userDb)
-        val userFactory = com.app.tourism_app.database.view.UserViewModelFactory(userRepository)
+        val userFactory = UserViewModelFactory(userRepository)
         userViewModel = ViewModelProvider(
             this,
             userFactory
-        ).get(com.app.tourism_app.database.view.UserViewModel::class.java)
+        ).get(UserViewModel::class.java)
 
         btnSubmit.setOnClickListener {
             val rating = ratingBar.rating.toInt()

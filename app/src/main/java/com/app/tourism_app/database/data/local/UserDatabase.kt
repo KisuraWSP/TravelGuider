@@ -1,4 +1,4 @@
-package com.app.tourism_app.database
+package com.app.tourism_app.database.data.local
 
 import android.content.Context
 import androidx.room.Database
