@@ -19,10 +19,10 @@
         android:textColor="@android:color/black"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
+        android:paddingBottom="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:paddingBottom="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Recommendations list -->
     <androidx.recyclerview.widget.RecyclerView
@@ -37,7 +37,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Empty state (hidden by default, toggle in code if no data) -->
+    <!-- Centered loading spinner -->
+    <ProgressBar
+        android:id="@+id/progress_home"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tv_home_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Empty state (hidden by default, toggle in code) -->
     <LinearLayout
         android:id="@+id/empty_state_home"
         android:layout_width="wrap_content"
@@ -58,6 +70,7 @@
             app:tint="#9E9E9E" />
 
         <TextView
+            android:id="@+id/empty_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No recommendations yet"

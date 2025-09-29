@@ -6,6 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
 
 object NetworkModule {
 
@@ -22,10 +23,18 @@ object NetworkModule {
         .add(KotlinJsonAdapterFactory())
         .build()
 
-    private val retrofit: Retrofit = Retrofit.Builder()
+    val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .build()
+
+    val retrofit = Retrofit.Builder()
         .baseUrl("https://api.geoapify.com/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(okHttp)
+        .addConverterFactory(MoshiConverterFactory.create())
+        // don’t force callbacks on main thread; we switch threads ourselves with withContext
+        .client(client)
         .build()
 
     fun provideApiService(): ApiService = retrofit.create(ApiService::class.java)

@@ -27,15 +27,30 @@
             android:padding="8dp"/>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Search results -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_search_results"
+    <!-- Results + Loading overlay -->
+    <FrameLayout
+        android:id="@+id/results_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingTop="4dp"
-        android:paddingBottom="16dp"/>
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_search_results"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="16dp"/>
+
+        <!-- Centered loading spinner -->
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+    </FrameLayout>
 
     <!-- Empty state (hidden until shown in code) -->
     <LinearLayout
@@ -55,6 +70,7 @@
             app:tint="#9E9E9E" />
 
         <TextView
+            android:id="@+id/empty_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No results found"

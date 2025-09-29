@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,10 +19,14 @@ import com.app.tourism_app.R
 import com.app.tourism_app.activities.PlaceDetailActivity
 import com.app.tourism_app.database.data.remote.Feature
 import com.app.tourism_app.database.data.remote.NetworkModule
+import com.app.tourism_app.database.data.remote.NetworkMonitor
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -29,6 +34,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -38,7 +44,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private lateinit var fabMyLocation: FloatingActionButton
     private var fusedClient: FusedLocationProviderClient? = null
 
-    // ActivityResult Launcher for location permission
+    // Permission launcher
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
@@ -63,15 +69,42 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Safe: fragment is attached now
+        // Safe now: fragment is attached
         fusedClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
-        // Add SupportMapFragment into the container
-        val existing = childFragmentManager.findFragmentByTag("map_fragment") as? SupportMapFragment
-        val mapFragment = existing ?: SupportMapFragment.newInstance().also {
-            childFragmentManager.beginTransaction()
-                .replace(R.id.map_container, it, "map_fragment")
-                .commitNowAllowingStateLoss()
+        // 1) Check Google Play Services before using Maps
+        val playOk = GoogleApiAvailability.getInstance()
+            .isGooglePlayServicesAvailable(requireContext()) == ConnectionResult.SUCCESS
+        if (!playOk) {
+            GoogleApiAvailability.getInstance()
+                .getErrorDialog(requireActivity(), ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, 9000)
+                ?.show()
+            Toast.makeText(requireContext(), "Google Play services not available. Map disabled.", Toast.LENGTH_SHORT).show()
+            fabMyLocation.isEnabled = false
+            return
+        }
+
+        // 2) Initialize Maps with latest renderer (more stable on many devices)
+        try {
+            MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST) { result ->
+                Log.d("MapFragment", "MapsInitializer: $result")
+            }
+        } catch (t: Throwable) {
+            Log.e("MapFragment", "MapsInitializer failed: ${t.message}", t)
+            Toast.makeText(requireContext(), "Map engine init failed.", Toast.LENGTH_SHORT).show()
+            fabMyLocation.isEnabled = false
+            return
+        }
+
+        // 3) Use a single SupportMapFragment instance; avoid commitNow/allowingStateLoss
+        val tag = "map_fragment"
+        val fm = childFragmentManager
+        val mapFragment = (fm.findFragmentByTag(tag) as? SupportMapFragment) ?: run {
+            val m = SupportMapFragment.newInstance()
+            fm.beginTransaction()
+                .replace(R.id.map_container, m, tag) // regular async commit
+                .commit()
+            m
         }
         mapFragment.getMapAsync(this)
 
@@ -82,13 +115,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 requestLocationPermission()
             }
         }
+
+        // 4) Disable actions when offline; clear markers if offline
+        viewLifecycleOwner.lifecycleScope.launch {
+            NetworkMonitor.isOnline.collectLatest { online ->
+                fabMyLocation.isEnabled = online
+                if (!online) {
+                    googleMap?.clear()
+                }
+            }
+        }
     }
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.setOnMarkerClickListener(this)
 
-        // default UI settings
+        // UI settings
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isMapToolbarEnabled = true
 
@@ -99,7 +142,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
             requestLocationPermission()
         }
 
-        // Load places and add markers
         addPlacesMarkers()
     }
 
@@ -117,19 +159,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         try {
             googleMap?.isMyLocationEnabled = hasLocationPermission()
         } catch (_: SecurityException) {
-            // ignore; permission gate above controls this
+            // gated by hasLocationPermission()
         }
     }
 
     @SuppressLint("MissingPermission") // we check permission inside
     private fun moveCameraToUserLocation() {
         val ctx = context ?: return
-        val permissionGranted = ContextCompat.checkSelfPermission(
-            ctx,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (!permissionGranted) return
+        if (!hasLocationPermission()) return
 
         try {
             fusedClient?.lastLocation
@@ -149,12 +186,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         }
     }
 
-    /**
-     * Fetch places from Geoapify and add markers.
-     * This is a simple example: it fetches a rectangular area.
-     */
+    /** Fetch places and add markers. Offline-aware, friendly errors, view-lifecycle scoped. */
     private fun addPlacesMarkers() {
-        // tie lifecycle to the VIEW so work is cancelled when the view is destroyed/hidden
+        val ctx = context ?: return
+
+        if (!NetworkMonitor.isOnlineNow(ctx)) {
+            Toast.makeText(ctx, "You’re offline. Connect to the internet to load places.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val api = NetworkModule.provideApiService()
@@ -167,15 +207,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                     )
                 }
 
-                // back to main to touch the map
                 withContext(Dispatchers.Main) {
                     if (!isAdded || view == null) return@withContext
                     addMarkersFromDtos(response.features)
                 }
             } catch (t: Throwable) {
-                context?.let {
-                    Toast.makeText(it, "Failed to load places: ${t.message}", Toast.LENGTH_SHORT).show()
+                val safe = context ?: return@launch
+                val msg = when (t) {
+                    is java.net.UnknownHostException -> "No internet connection."
+                    is java.net.SocketTimeoutException -> "Network is slow. Try again."
+                    is retrofit2.HttpException -> "Server error: ${t.code()}"
+                    else -> t.message ?: "Network error."
                 }
+                Toast.makeText(safe, msg, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -187,7 +231,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         for (f in list) {
             val p = f.properties
             val coords = f.geometry?.coordinates
-            // GeoJSON: [lon, lat]
+            // GeoJSON coordinates are [lon, lat]
             if (coords == null || coords.size < 2) continue
             val lon = coords[0]
             val lat = coords[1]
@@ -207,7 +251,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         }
     }
 
-    // When a marker is clicked, open PlaceDetailActivity for that place
     override fun onMarkerClick(marker: Marker): Boolean {
         val ctx = context ?: return true
         val placeId = (marker.tag as? Long) ?: 0L
@@ -221,6 +264,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     override fun onDestroyView() {
+        // Avoid rapid re-create/teardown cycles holding native locks
         googleMap = null
         fusedClient = null
         super.onDestroyView()
