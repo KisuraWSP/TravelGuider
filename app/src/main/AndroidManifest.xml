@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.app.tourism_app">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -9,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,7 +30,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,6 +44,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Activities -->
         <activity
             android:name=".activities.SettingsActivity"
             android:exported="false" />
@@ -62,7 +65,5 @@
             android:name=".activities.CrashHandlerActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.DayNight.Dialog.Alert"/>
-
     </application>
-
 </manifest>

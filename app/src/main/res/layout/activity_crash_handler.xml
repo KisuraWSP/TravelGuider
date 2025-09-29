@@ -1,28 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="vertical" android:padding="20dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@android:color/background_light">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Big title -->
         <TextView
             android:id="@+id/tvTitle"
-            android:text="Something went wrong"
-            android:textSize="20sp" android:textStyle="bold"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            android:text="⚠️ Something went wrong"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
+        <!-- Short message -->
         <TextView
-            android:id="@+id/tvMsg" android:layout_marginTop="8dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            android:id="@+id/tvMsg"
+            android:layout_marginTop="12dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/tvTrace" android:layout_marginTop="16dp"
-            android:typeface="monospace"
-            android:layout_width="match_parent" android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btnRestart" android:text="Restart app"
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:layout_marginTop="16dp"
-            android:layout_width="match_parent" android:layout_height="wrap_content" />
+            android:background="#DDDDDD" />
+
+        <!-- Stack trace label -->
+        <TextView
+            android:text="Details"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Scrollable trace text -->
+        <TextView
+            android:id="@+id/tvTrace"
+            android:layout_marginTop="8dp"
+            android:scrollbars="vertical"
+            android:overScrollMode="ifContentScrolls"
+            android:fadeScrollbars="false"
+            android:textSize="12sp"
+            android:textColor="#444"
+            android:background="#F5F5F5"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:typeface="monospace" />
+
+        <!-- Restart button -->
+        <Button
+            android:id="@+id/btnRestart"
+            android:text="Restart App"
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?attr/materialButtonOutlinedStyle"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 </ScrollView>

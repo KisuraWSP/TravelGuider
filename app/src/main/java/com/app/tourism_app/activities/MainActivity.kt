@@ -34,26 +34,26 @@ class MainActivity : AppCompatActivity() {
     private val guestInfoFragment = GuestInfoFragment()
 
     private var activeFragment: Fragment = homeFragment
-
     private var offlineBar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // We’ll handle system bars ourselves
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val container: View = findViewById(R.id.main_container)
+        val root: View = findViewById(R.id.main_root)
+        val container: View = findViewById(R.id.main_container)   // stays 651dp (from XML)
         val bottomNav: BottomNavigationView = findViewById(R.id.bottom_nav)
         val appBar: View? = findViewById(R.id.appbar)
 
-        // Start network monitoring once for the app process
+        // Start network monitoring once per process
         NetworkMonitor.start(applicationContext)
 
-        // Read the guest flag (comes from LoginActivity when Guest Login is used)
         val isGuest = intent.getBooleanExtra("isGuest", false)
 
-        // Pad only the appbar for status bar
+        // Status bar -> add top padding to AppBar
         appBar?.let { bar ->
             ViewCompat.setOnApplyWindowInsetsListener(bar) { v, insets ->
                 val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
@@ -62,21 +62,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Let the container handle bottom insets (keyboard + nav bar)
-        ViewCompat.setOnApplyWindowInsetsListener(container) { v, insets ->
-            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
-
-            val bottomInset = if (insets.isVisible(WindowInsetsCompat.Type.ime())) {
-                ime.bottom
-            } else 0
-
-            val topInset = if (appBar == null) sys.top else 0
-            v.updatePadding(top = topInset, bottom = bottomInset)
+        // Nav bar -> add bottom padding to BottomNav itself
+        ViewCompat.setOnApplyWindowInsetsListener(bottomNav) { v, insets ->
+            val sb = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            v.updatePadding(bottom = sb)
             insets
         }
 
-        // --- fragment setup ---
+        // Keep 651dp container visually above BottomNav; lift for keyboard when visible
+        ViewCompat.setOnApplyWindowInsetsListener(container) { v, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val bnHeight = bottomNav.height
+
+            // When keyboard is open → use IME height; otherwise use BottomNav height.
+            val bottomPad = if (imeVisible && imeInsets > 0) imeInsets else bnHeight
+
+            // If you ever remove the AppBar, also apply status bar top padding to container here.
+            v.updatePadding(bottom = bottomPad)
+            insets
+        }
+
+        // Fragment setup (show/hide pattern)
         supportFragmentManager.beginTransaction()
             .add(R.id.main_container, favoritesFragment, "favorites").hide(favoritesFragment)
             .add(R.id.main_container, mapFragment, "map").hide(mapFragment)
@@ -85,8 +92,9 @@ class MainActivity : AppCompatActivity() {
             .add(R.id.main_container, searchFragment, "search").hide(searchFragment)
             .add(R.id.main_container, homeFragment, "home")
             .commit()
+        activeFragment = homeFragment
 
-        // Optional: hint that profile is limited in guest mode
+        // Badge profile when guest; clicking Profile shows GuestInfo
         if (isGuest) {
             bottomNav.getOrCreateBadge(R.id.nav_profile).apply {
                 isVisible = true
@@ -106,12 +114,12 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // --- (2) Persistent offline warning banner with Settings action ---
+        // Offline banner with shortcut to Settings
         lifecycleScope.launch {
             NetworkMonitor.isOnline.collectLatest { online ->
                 if (!online) {
                     if (offlineBar?.isShown == true) return@collectLatest
-                    offlineBar = Snackbar.make(container, "No internet — some features are disabled", Snackbar.LENGTH_INDEFINITE)
+                    offlineBar = Snackbar.make(root, "No internet — some features are disabled", Snackbar.LENGTH_INDEFINITE)
                         .setAction("Settings") {
                             startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
                         }
@@ -124,13 +132,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun switchFragment(target: Fragment): Boolean {
-        if (activeFragment != target) {
-            supportFragmentManager.beginTransaction()
-                .hide(activeFragment)
-                .show(target)
-                .commit()
-            activeFragment = target
-        }
+        if (activeFragment === target) return true
+        supportFragmentManager.beginTransaction()
+            .hide(activeFragment)
+            .show(target)
+            .commit()
+        activeFragment = target
         return true
     }
 }
