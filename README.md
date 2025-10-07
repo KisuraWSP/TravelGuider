@@ -56,7 +56,7 @@
 
 
 ## 📸 Screenshots
-![Login Screen](screen_shots/login_page.png) 
+![Login Screen](screen_shots/login_page.png)
 ![Create User](screen_shots/create_user_page.png)
 ![Guest Login](screen_shots/guest_login.png)
 ![Home](screen_shots/home_page.png)
@@ -64,5 +64,5 @@
 ![Place Detail with Review](screen_shots/place_detail_page_with_review.png)
 ![Search](screen_shots/search_page.png)
 ![Review](screen_shots/review_page.png)
-![Map View](screen_shots/map_page.png)  
+![Map View](screen_shots/map_page.png)
 ![Favorites](screen_shots/favorites_page.png)
