@@ -63,6 +63,5 @@
 ![Guest Login](screen_shots/guest_login.png)
 ![Home](screen_shots/home_page.png)
 ![Place Detail](screen_shots/place_detail_page.png)
-![Place Detail](screen_shots/place_detail_page.png)
 ![Place Detail with Review](screen_shots/place_detail_page_with_review.png)
 ![Search](screen_shots/search_page.png)
